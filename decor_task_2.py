@@ -1,15 +1,19 @@
 from datetime import datetime
 
-def make_trace(old_function): #paht
-    def new_function(path2):
-        time = datetime.now()
+def parametrized_decor(parameter):
+    def decor(foo):
+        def new_foo(*args, **kwars):
+            time = datetime.now()
+            result = foo(*args, **kwars)
+            arguments = sum(arg*2 for arg in args)
+            with open(f'{parameter}.log', 'a') as file:
+                file.write(f'Имя функции: {foo.__name__} \nДата и время вызова: {time}\nРезультат функции до обработки: {result}\nРезультат функции ПОСЛЕ обработки:{arguments}\n')
+            return result
+        return new_foo
+    return decor
 
-        with open(f'{path2}', 'a') as file:
-            file.write(f'Имя функции: {old_function.__name__}. \nДата и время вызова: {time}\n')
-    return new_function
+@parametrized_decor(parameter='путь_к_логам')
+def foo(x, y):
+    return x + y
 
-@make_trace
-def task(path):
-    return 'test'
-
-task('TASK_2.log')
+foo(2, 5)
